@@ -1,0 +1,73 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  canonical?: string;
+}
+
+const POSTER =
+  'https://customer-wa9cpywo3l4jte5c.cloudflarestream.com/9eb81fa273d4c381dee9ad1b27f30526/thumbnails/thumbnail.jpg?time=&height=600';
+
+const {
+  title = 'ABQ.Coffee | Albuquerque Coffee Brand',
+  description = 'Albuquerque coffee brand concept for cafes, roasters, and neighborhood shops. Domain available for acquisition.',
+  ogImage = POSTER,
+  canonical = 'https://abq.coffee/',
+} = Astro.props;
+
+const siteName = 'ABQ.Coffee';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <link rel="canonical" href={canonical} />
+    <meta name="google-site-verification" content="h8Hy8oJWdGVkDzwxG6XMaJqp77Hj9xlEz791AWoR5bQ" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:locale" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#2a1913" />
+
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": siteName,
+      "url": "https://abq.coffee",
+      "description": description
+    })} />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": title,
+      "description": description,
+      "url": canonical,
+      "primaryImageOfPage": { "@type": "ImageObject", "url": ogImage },
+      "datePublished": "2026-09-08",
+      "dateModified": "2026-09-08"
+    })} />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <slot />
+  </body>
+</html>

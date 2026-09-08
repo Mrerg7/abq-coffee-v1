@@ -1,0 +1,50 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer id="acquisition" class="bg-roast-950 text-cream-100">
+  <div class="border-b border-white/10">
+    <div class="container-narrow py-12 sm:py-16">
+      <div class="mx-auto max-w-2xl text-center">
+        <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-roast-400/30 bg-roast-400/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-roast-200">
+          <span class="relative flex h-2 w-2">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-roast-300 opacity-75"></span>
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-roast-300"></span>
+          </span>
+          Domain Available
+        </div>
+        <h2 class="font-display text-3xl font-semibold text-white sm:text-4xl">
+          Acquire <span class="text-roast-300">ABQ.Coffee</span>
+        </h2>
+        <p class="mt-4 text-sm leading-relaxed text-cream-200 sm:text-base">
+          Short city + category domain for a cafe, roaster, cart, or multi-shop brand in Albuquerque.
+        </p>
+        <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <a href="mailto:sales@desertrich.com?subject=Domain%20Inquiry%3A%20ABQ.Coffee" class="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-roast-500 px-6 py-3 text-sm font-semibold text-white hover:bg-roast-400 sm:w-auto">
+            sales@desertrich.com
+          </a>
+          <span class="text-sm text-cream-200/70">Serious inquiries only</span>
+        </div>
+        <p class="mt-5 text-xs text-cream-200/50">Confidential. Response within 1–2 business days.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-narrow py-8">
+    <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <p class="text-sm font-medium text-white">ABQ.Coffee</p>
+        <p class="text-xs text-cream-200/60">Informational platform</p>
+      </div>
+      <p class="max-w-md text-xs leading-relaxed text-cream-200/55 sm:text-right">
+        This website is for demonstration and informational purposes only. It does not constitute an offer of services,
+        a commitment to deploy, or a guarantee of outcomes. All statistics, projections, and references to specific
+        technologies are based on publicly available information as of the date shown and are subject to change.
+      </p>
+    </div>
+    <div class="mt-8 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-cream-200/45 sm:flex-row sm:justify-between">
+      <p>© {currentYear} ABQ.Coffee. All rights reserved.</p>
+      <p>Astro · Cloudflare Workers Static Assets · Stream</p>
+    </div>
+  </div>
+</footer>
