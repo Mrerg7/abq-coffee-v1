@@ -15,8 +15,8 @@ const blurb = 'A short, memorable domain for cafes, roasters, and coffee brands 
 
   <main class="flex-1">
     <section class="bg-roast-950">
-      {/* Taller frame on mobile so Stream is readable; no text overlay below md. */}
-      <div class="relative aspect-[5/4] w-full overflow-hidden md:aspect-[1.843]">
+      {/* Match Stream aspect so the iframe fills edge-to-edge; copy stays below on mobile. */}
+      <div class="relative aspect-[1.843] w-full overflow-hidden">
         <iframe
           src={STREAM_SRC}
           title="ABQ.Coffee hero video"
