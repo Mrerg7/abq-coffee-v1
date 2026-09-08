@@ -12,31 +12,32 @@ const STREAM_SRC =
 
   <main class="flex-1">
     <section class="relative bg-roast-950">
+      {/* Video stays clear on mobile; copy sits below. Desktop keeps bottom overlay. */}
       <div class="relative w-full" style="padding-top: 54.32098765432099%;">
         <iframe
           src={STREAM_SRC}
           title="ABQ.Coffee hero video"
-          loading="lazy"
+          loading="eager"
           style="border: none; position: absolute; top: 0; left: 0; height: 100%; width: 100%;"
           allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
           allowfullscreen="true"
         ></iframe>
-        <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-roast-950 via-roast-950/55 to-roast-950/20"></div>
-        <div class="absolute inset-0 flex items-end">
-          <div class="container-narrow w-full pb-6 pt-16 sm:pb-10 sm:pt-20">
-            <p class="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-roast-200 sm:mb-3 sm:text-xs">
-              Albuquerque · Roast · Pour · Gather
-            </p>
-            <h1 class="font-display text-4xl font-semibold leading-none text-white sm:text-6xl lg:text-7xl">
-              ABQ<span class="text-roast-300">.Coffee</span>
-            </h1>
-            <p class="mt-3 max-w-xl text-sm leading-relaxed text-cream-100/90 sm:mt-5 sm:text-lg">
-              A short, memorable domain for cafes, roasters, and coffee brands in the high desert.
-            </p>
-            <div class="mt-5 flex flex-col gap-2 sm:mt-8 sm:flex-row sm:gap-3">
-              <a href="#cup" class="btn-primary pointer-events-auto">Explore the Brand</a>
-              <a href="#acquisition" class="btn-secondary pointer-events-auto">Domain Available</a>
-            </div>
+        <div class="pointer-events-none absolute inset-0 hidden bg-gradient-to-t from-roast-950 via-roast-950/55 to-roast-950/20 sm:block"></div>
+      </div>
+      <div class="relative sm:absolute sm:inset-0 sm:flex sm:items-end">
+        <div class="container-narrow w-full pb-8 pt-6 sm:pb-10 sm:pt-20">
+          <p class="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-roast-200 sm:mb-3 sm:text-xs">
+            Albuquerque · Roast · Pour · Gather
+          </p>
+          <h1 class="font-display text-4xl font-semibold leading-none text-white sm:text-6xl lg:text-7xl">
+            ABQ<span class="text-roast-300">.Coffee</span>
+          </h1>
+          <p class="mt-3 max-w-xl text-sm leading-relaxed text-cream-100/90 sm:mt-5 sm:text-lg">
+            A short, memorable domain for cafes, roasters, and coffee brands in the high desert.
+          </p>
+          <div class="mt-5 flex flex-col gap-2 sm:mt-8 sm:flex-row sm:gap-3">
+            <a href="#cup" class="btn-primary pointer-events-auto">Explore the Brand</a>
+            <a href="#acquisition" class="btn-secondary pointer-events-auto">Domain Available</a>
           </div>
         </div>
       </div>
