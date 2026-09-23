@@ -1,22 +1,102 @@
 ---
+import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Acquisition from '../components/Acquisition.astro';
+import { SITE, ACQUISITION_MAILTO } from '../config/site';
 
-const STREAM_SRC =
-  'https://customer-wa9cpywo3l4jte5c.cloudflarestream.com/9eb81fa273d4c381dee9ad1b27f30526/iframe?muted=true&loop=true&autoplay=true&poster=https%3A%2F%2Fcustomer-wa9cpywo3l4jte5c.cloudflarestream.com%2F9eb81fa273d4c381dee9ad1b27f30526%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false';
+type Insight = CollectionEntry<'insights'>;
+
+const STREAM_SRC = `https://${SITE.streamHost}/${SITE.streamId}/iframe?muted=true&loop=true&autoplay=true&poster=https%3A%2F%2F${SITE.streamHost}%2F${SITE.streamId}%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false`;
 
 const eyebrow = 'Albuquerque · Roast · Pour · Gather';
 const blurb = 'A short, memorable domain for cafes, roasters, and coffee brands in the high desert.';
+
+const faqs = [
+  {
+    q: `Is ${SITE.domain} for sale?`,
+    a: `Yes. ${SITE.domain} is a premium domain name available for acquisition from the owner. Serious buyers can use the inquiry form on this page or email ${SITE.email}. We respond personally within 1–2 business days.`,
+  },
+  {
+    q: 'What is the asking price?',
+    a: `The listed acquisition price is ${SITE.priceDisplay} USD, one-time, with full ownership and a clean title. Submit an offer through the inquiry form if you would like to discuss terms.`,
+  },
+  {
+    q: 'How do I buy this domain?',
+    a: `Send an inquiry through the form on this page or email ${SITE.email} with your offer and timeline. Every transaction is completed through Escrow.com so funds and domain transfer are both protected.`,
+  },
+  {
+    q: 'Who is this domain for?',
+    a: 'ABQ.Coffee fits a single cafe, a specialty roasting company, a coffee cart or market vendor, or a hospitality group expanding in New Mexico. City plus category in one hostname — the name people already type.',
+  },
+  {
+    q: 'Is the domain transfer safe?',
+    a: 'Yes. Acquisitions are escrow-protected via Escrow.com. The domain has a clean title and transfers to your registrar account, typically within 0–5 business days after cleared payment.',
+  },
+  {
+    q: 'Why does city + category matter for local SEO?',
+    a: 'When the brand, the domain, and the query are the same string, your Google Business Profile name, meta title, and window decal all reinforce each other. "ABQ" plus "coffee" is how residents and visitors search — the exact-match domain arrives already matched to that intent.',
+  },
+  {
+    q: 'Does coffee brew differently at Albuquerque altitude?',
+    a: 'Yes. Albuquerque sits near 5,300 feet. Lower air pressure means water boils at a lower temperature and carbon dioxide escapes beans faster, so recipes call for slightly hotter water, a finer grind, and fresher roasts than sea-level shops use.',
+  },
+];
+
+const faqSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: { '@type': 'Answer', text: item.a },
+  })),
+};
+
+const posts = (
+  await getCollection('insights', (entry: Insight): entry is Insight => !entry.data.draft)
+)
+  .sort((a: Insight, b: Insight) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const cupCards = [
+  {
+    title: 'Cafe',
+    body: 'Neighborhood espresso, drip, and pastry. A name that fits a sandwich board and a maps listing.',
+  },
+  {
+    title: 'Roaster',
+    body: 'Bags, wholesale, and subscription. City + category on the label, no extra explanation required.',
+  },
+  {
+    title: 'Cart & events',
+    body: 'Markets, studios, and pop-ups. Short enough to print on a cup sleeve.',
+  },
+];
+
+const cityPoints = [
+  {
+    strong: 'Local search intent',
+    body: 'ABQ plus coffee is how visitors and residents look for a shop.',
+  },
+  {
+    strong: 'Altitude-aware brewing',
+    body: 'Extraction and recipes behave differently above 5,000 feet.',
+  },
+  {
+    strong: 'All-day format',
+    body: 'Morning espresso through afternoon patio pours.',
+  },
+];
 ---
 
-<Layout>
+<Layout schemas={[faqSchema]}>
   <Header />
 
-  <main class="flex-1">
-    <section class="bg-roast-950">
-      {/* Match Stream aspect so the iframe fills edge-to-edge; copy stays below on mobile. */}
-      <div class="relative aspect-[1.843] w-full overflow-hidden">
+  <main id="main-content" class="flex-1">
+    <section class="relative overflow-hidden bg-roast-950">
+      <div class="relative aspect-[1.843] w-full">
         <iframe
           src={STREAM_SRC}
           title="ABQ.Coffee hero video"
@@ -25,31 +105,26 @@ const blurb = 'A short, memorable domain for cafes, roasters, and coffee brands 
           allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
           allowfullscreen="true"
         ></iframe>
-        <div class="pointer-events-none absolute inset-0 hidden bg-gradient-to-t from-roast-950 via-roast-950/55 to-roast-950/20 md:block"></div>
-        <div class="absolute inset-0 hidden items-end md:flex">
-          <div class="container-narrow w-full pb-10 pt-20">
-            <p class="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-roast-200">{eyebrow}</p>
-            <h1 class="font-display text-6xl font-semibold leading-none text-white lg:text-7xl">
-              ABQ<span class="text-roast-300">.Coffee</span>
-            </h1>
-            <p class="mt-5 max-w-xl text-lg leading-relaxed text-cream-100/90">{blurb}</p>
-            <div class="mt-8 flex flex-row gap-3">
-              <a href="#cup" class="btn-primary pointer-events-auto">Explore the Brand</a>
-              <a href="#acquisition" class="btn-secondary pointer-events-auto">Domain Available</a>
-            </div>
-          </div>
-        </div>
+        <div
+          class="pointer-events-none absolute inset-0 hidden bg-gradient-to-t from-roast-950 via-roast-950/55 to-roast-950/20 sm:block"
+          aria-hidden="true"
+        ></div>
       </div>
-      <div class="border-t border-white/10 md:hidden">
-        <div class="container-narrow pb-8 pt-6">
-          <p class="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-roast-200">{eyebrow}</p>
-          <h1 class="font-display text-4xl font-semibold leading-none text-white">
+
+      <div class="sm:absolute sm:inset-0 sm:flex sm:items-end">
+        <div class="container-narrow w-full pb-10 pt-8 sm:pb-12 sm:pt-20">
+          <p class="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-roast-200 sm:text-xs">
+            {eyebrow}
+          </p>
+          <h1 class="font-display text-4xl font-semibold leading-none text-white sm:text-6xl lg:text-7xl">
             ABQ<span class="text-roast-300">.Coffee</span>
           </h1>
-          <p class="mt-3 max-w-xl text-sm leading-relaxed text-cream-100/90">{blurb}</p>
-          <div class="mt-5 flex flex-col gap-2">
-            <a href="#cup" class="btn-primary">Explore the Brand</a>
-            <a href="#acquisition" class="btn-secondary">Domain Available</a>
+          <p class="mt-4 max-w-xl text-sm leading-relaxed text-cream-100/90 sm:mt-5 sm:text-lg">{blurb}</p>
+          <div class="mt-6 flex flex-col gap-2 sm:mt-8 sm:flex-row sm:gap-3">
+            <a href="#cup" class="btn-primary pointer-events-auto">Explore the Brand</a>
+            <a href="#acquisition" class="btn-secondary pointer-events-auto">
+              Domain Available — {SITE.priceDisplay}
+            </a>
           </div>
         </div>
       </div>
@@ -58,31 +133,29 @@ const blurb = 'A short, memorable domain for cafes, roasters, and coffee brands 
     <section id="cup" class="section-padding bg-white">
       <div class="container-narrow">
         <div class="max-w-2xl">
-          <h2 class="font-display text-3xl font-semibold text-roast-950 sm:text-4xl">The cup comes first</h2>
+          <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-roast-600">The Cup</p>
+          <h2 class="mt-3 font-display text-3xl font-semibold text-roast-950 sm:text-4xl">The cup comes first</h2>
           <p class="mt-4 text-base text-roast-800 sm:text-lg">
             A coffee brand in Albuquerque has to work at 5,300 feet — for early commuters, campus traffic, and weekend patio hours.
           </p>
         </div>
 
         <div class="mt-10 grid gap-4 sm:mt-12 sm:gap-6 md:grid-cols-3">
-          <article class="card">
-            <h3 class="font-display text-xl font-semibold text-roast-950">Cafe</h3>
-            <p class="mt-2 text-sm leading-relaxed text-roast-700">
-              Neighborhood espresso, drip, and pastry. A name that fits a sandwich board and a maps listing.
-            </p>
-          </article>
-          <article class="card">
-            <h3 class="font-display text-xl font-semibold text-roast-950">Roaster</h3>
-            <p class="mt-2 text-sm leading-relaxed text-roast-700">
-              Bags, wholesale, and subscription. City + category on the label, no extra explanation required.
-            </p>
-          </article>
-          <article class="card">
-            <h3 class="font-display text-xl font-semibold text-roast-950">Cart & events</h3>
-            <p class="mt-2 text-sm leading-relaxed text-roast-700">
-              Markets, studios, and pop-ups. Short enough to print on a cup sleeve.
-            </p>
-          </article>
+          {
+            cupCards.map((card) => (
+              <article class="card">
+                <h3 class="font-display text-xl font-semibold text-roast-950">{card.title}</h3>
+                <p class="mt-2 text-sm leading-relaxed text-roast-700">{card.body}</p>
+              </article>
+            ))
+          }
+        </div>
+
+        <div class="mt-10 text-center">
+          <a href="/insights/" class="inline-flex items-center gap-2 text-sm font-medium text-roast-900 underline decoration-roast-400 underline-offset-4 hover:text-roast-700">
+            Read the coffee insights
+            <span aria-hidden="true">→</span>
+          </a>
         </div>
       </div>
     </section>
@@ -90,14 +163,22 @@ const blurb = 'A short, memorable domain for cafes, roasters, and coffee brands 
     <section id="city" class="section-padding bg-cream-100">
       <div class="container-narrow grid gap-10 lg:grid-cols-2 lg:items-start">
         <div>
-          <h2 class="font-display text-3xl font-semibold text-roast-950 sm:text-4xl">Made for the high desert</h2>
+          <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-roast-600">The City</p>
+          <h2 class="mt-3 font-display text-3xl font-semibold text-roast-950 sm:text-4xl">Made for the high desert</h2>
           <p class="mt-4 text-base text-roast-800 sm:text-lg">
             Dry air, bright mornings, and a cafe scene that stretches from Nob Hill to the West Side. The domain matches the city people already type.
           </p>
           <ul class="mt-8 space-y-4 text-sm text-roast-800 sm:text-base">
-            <li class="flex gap-3"><span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-roast-500"></span><span><strong class="text-roast-950">Local search intent</strong> — ABQ plus coffee is how visitors and residents look for a shop.</span></li>
-            <li class="flex gap-3"><span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-roast-500"></span><span><strong class="text-roast-950">Altitude-aware brewing</strong> — extraction and recipes behave differently above 5,000 feet.</span></li>
-            <li class="flex gap-3"><span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-roast-500"></span><span><strong class="text-roast-950">All-day format</strong> — morning espresso through afternoon patio pours.</span></li>
+            {
+              cityPoints.map((point) => (
+                <li class="flex gap-3">
+                  <span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-roast-500"></span>
+                  <span>
+                    <strong class="text-roast-950">{point.strong}</strong> — {point.body}
+                  </span>
+                </li>
+              ))
+            }
           </ul>
         </div>
         <div class="rounded-2xl border border-roast-100 bg-white p-5 sm:p-8">
@@ -124,24 +205,120 @@ const blurb = 'A short, memorable domain for cafes, roasters, and coffee brands 
     </section>
 
     <section id="brand" class="section-padding bg-white">
-      <div class="container-narrow max-w-3xl">
-        <h2 class="font-display text-3xl font-semibold text-roast-950 sm:text-4xl">Why this domain</h2>
+      <div class="container-narrow max-w-3xl text-center">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-roast-600">The Domain</p>
+        <h2 class="mt-3 font-display text-3xl font-semibold text-roast-950 sm:text-4xl">Why this domain</h2>
         <div class="mt-6 space-y-4 text-sm leading-relaxed text-roast-800 sm:text-base">
           <p>
-            <strong class="text-roast-950">ABQ.Coffee</strong> is city plus category in six letters and a purpose-built TLD.
+            <strong class="text-roast-950">{SITE.domain}</strong> is city plus category in six letters and a purpose-built TLD.
             It reads cleanly on a window, a bag, and a search result.
           </p>
           <p>
-            Available for a single cafe, a roasting company, or a hospitality group expanding in New Mexico.
+            Available for a single cafe, a roasting company, a coffee cart, or a hospitality group expanding in New Mexico.
+            Every word a customer would search — <em>ABQ</em>, <em>coffee</em> — is already in the hostname, so the brand and
+            the query arrive together.
           </p>
+        </div>
+        <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <a href="#acquisition" class="btn-primary">Make an offer</a>
+          <a
+            href="/insights/why-abq-coffee/"
+            class="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-roast-300 px-7 py-3 text-sm font-medium text-roast-900 hover:bg-roast-50 sm:w-auto"
+          >
+            Read the brand story
+          </a>
         </div>
       </div>
     </section>
 
+    <section id="faq" class="section-padding bg-cream-100">
+      <div class="container-narrow">
+        <div class="mx-auto max-w-2xl text-center">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-roast-600">FAQ</p>
+          <h2 class="mt-3 font-display text-3xl font-semibold text-roast-950 sm:text-4xl">
+            Questions buyers ask
+          </h2>
+          <p class="mt-4 text-base leading-relaxed text-roast-800 sm:text-lg">
+            Everything about the offer, the transfer, and the category the name was built for. Something missing?
+            <a
+              href={ACQUISITION_MAILTO(`Domain Inquiry: ${SITE.domain}`)}
+              class="font-medium text-roast-950 underline decoration-roast-400 underline-offset-4"
+            >
+              Ask us directly
+            </a>.
+          </p>
+        </div>
+
+        <div class="mx-auto mt-12 max-w-3xl space-y-4">
+          {
+            faqs.map((item) => (
+              <details class="card group">
+                <summary class="flex cursor-pointer list-none items-start justify-between gap-4 font-display text-xl font-semibold text-roast-950 sm:text-2xl">
+                  <span>{item.q}</span>
+                  <svg
+                    class="mt-1 h-5 w-5 shrink-0 text-roast-500 transition-transform group-open:rotate-45"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                </summary>
+                <p class="mt-3 text-sm leading-relaxed text-roast-700 sm:text-base">{item.a}</p>
+              </details>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id="insights" class="section-padding bg-white">
+      <div class="container-narrow">
+        <div class="mx-auto max-w-2xl text-center">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-roast-600">Insights</p>
+          <h2 class="mt-3 font-display text-3xl font-semibold text-roast-950 sm:text-4xl">
+            Coffee knowledge from {SITE.name}
+          </h2>
+          <p class="mt-4 text-base leading-relaxed text-roast-800 sm:text-lg">
+            Practical writing on high-desert brewing, the Albuquerque scene, and brand naming — the category {SITE.domain} was built to lead.
+          </p>
+        </div>
+
+        <div class="mt-12 grid gap-6 md:grid-cols-3">
+          {
+            posts.map((post: Insight) => (
+              <a href={`/insights/${post.slug}/`} class="card group flex flex-col transition hover:-translate-y-1">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-roast-500">
+                  {post.data.pubDate.toISOString().split('T')[0]}
+                </p>
+                <h3 class="mt-3 font-display text-xl font-semibold text-roast-950 group-hover:text-roast-700">
+                  {post.data.title}
+                </h3>
+                <p class="mt-3 text-sm leading-relaxed text-roast-700">{post.data.description}</p>
+                <span class="mt-4 text-sm font-medium text-roast-900">Read more →</span>
+              </a>
+            ))
+          }
+        </div>
+
+        <div class="mt-10 text-center">
+          <a href="/insights/" class="inline-flex items-center gap-2 text-sm font-medium text-roast-900 underline decoration-roast-400 underline-offset-4 hover:text-roast-700">
+            All insights
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <Acquisition />
+
     <section class="border-t border-roast-100 bg-cream-100 py-10 sm:py-12">
       <div class="container-narrow text-center">
         <p class="mx-auto max-w-2xl text-xs leading-relaxed text-roast-600 sm:text-sm">
-          Information presented is for demonstration and educational purposes only and does not constitute an offer of cafe or roasting services.
+          Information presented is for demonstration and educational purposes only and does not constitute an offer of
+          cafe or roasting services. The domain {SITE.domain} is offered for sale by its owner.
         </p>
       </div>
     </section>

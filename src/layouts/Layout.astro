@@ -1,24 +1,184 @@
 ---
 import '../styles/global.css';
+import { SITE } from '../config/site';
+
+interface Breadcrumb {
+  name: string;
+  path: string;
+}
+
+interface ArticleMeta {
+  publishedTime?: string;
+  modifiedTime?: string;
+  tags?: string[];
+}
 
 interface Props {
   title?: string;
   description?: string;
   ogImage?: string;
-  canonical?: string;
+  canonical?: string | false;
+  robots?: string;
+  ogType?: 'website' | 'article';
+  keywords?: string;
+  breadcrumbs?: Breadcrumb[];
+  article?: ArticleMeta;
+  schemas?: Record<string, unknown>[];
 }
 
-const POSTER =
-  'https://customer-wa9cpywo3l4jte5c.cloudflarestream.com/9eb81fa273d4c381dee9ad1b27f30526/thumbnails/thumbnail.jpg?time=&height=600';
-
 const {
-  title = 'ABQ.Coffee | Albuquerque Coffee Brand',
-  description = 'Albuquerque coffee brand concept for cafes, roasters, and neighborhood shops. Domain available for acquisition.',
-  ogImage = POSTER,
-  canonical = 'https://abq.coffee/',
+  title = `${SITE.name} — Albuquerque Coffee Domain for Sale, ${SITE.priceDisplay}`,
+  description = `${SITE.domain} is for sale — a premium city + category domain for Albuquerque cafes, roasters, and coffee carts. Asking ${SITE.priceDisplay} via Escrow.com.`,
+  ogImage = SITE.ogImage,
+  ogType = 'website',
+  robots = 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
+  keywords = 'ABQ.Coffee, abq.coffee domain for sale, Albuquerque coffee domain, coffee domain for sale, ABQ coffee brand, premium .coffee domain, domain for sale $100,000',
+  breadcrumbs = [],
+  article,
+  schemas = [],
 } = Astro.props;
 
-const siteName = 'ABQ.Coffee';
+const pathname = Astro.url.pathname;
+const normalizedPath =
+  pathname === '/' || pathname === '/index.html'
+    ? '/'
+    : pathname.endsWith('/')
+      ? pathname
+      : `${pathname}/`;
+const canonicalUrl =
+  Astro.props.canonical === false
+    ? null
+    : Astro.props.canonical
+      ? Astro.props.canonical.startsWith('http')
+        ? Astro.props.canonical
+        : `${SITE.url}${Astro.props.canonical}`
+      : `${SITE.url}${normalizedPath}`;
+
+const today = new Date().toISOString().split('T')[0];
+const streamPoster = `https://${SITE.streamHost}/${SITE.streamId}/thumbnails/thumbnail.jpg?time=&height=600`;
+
+const breadcrumbSchema =
+  breadcrumbs.length && canonicalUrl
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: breadcrumbs.map((crumb, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: crumb.name,
+          item: crumb.path.startsWith('http') ? crumb.path : `${SITE.url}${crumb.path}`,
+        })),
+      }
+    : null;
+
+const articleSchema =
+  ogType === 'article' && canonicalUrl
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: title,
+        description,
+        image: ogImage,
+        datePublished: article?.publishedTime,
+        dateModified: article?.modifiedTime ?? article?.publishedTime,
+        author: { '@type': 'Organization', name: SITE.seller, url: SITE.url },
+        publisher: { '@type': 'Organization', name: SITE.seller, url: SITE.url },
+        mainEntityOfPage: canonicalUrl,
+        keywords: keywords.split(',').map((k) => k.trim()),
+        inLanguage: 'en-US',
+      }
+    : null;
+
+const baseSchemas: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: SITE.seller,
+    url: SITE.url,
+    logo: `${SITE.url}/favicon.svg`,
+    email: SITE.email,
+    description: `Owner and seller of the ${SITE.domain} premium domain name.`,
+    contactPoint: {
+      '@type': 'ContactPoint',
+      email: SITE.email,
+      contactType: 'sales',
+      availableLanguage: 'English',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE.name,
+    url: SITE.url,
+    description,
+    inLanguage: 'en-US',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: title,
+    description,
+    url: canonicalUrl ?? SITE.url,
+    primaryImageOfPage: { '@type': 'ImageObject', url: ogImage, caption: SITE.ogImageAlt },
+    datePublished: '2026-09-08',
+    dateModified: today,
+    inLanguage: 'en-US',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: `${SITE.domain} Premium Domain Name`,
+    description: `Exact-match city + category .coffee domain for Albuquerque cafes, roasters, and coffee carts. Available for acquisition at ${SITE.priceDisplay}.`,
+    url: SITE.url,
+    category: 'Premium Domain Name',
+    image: [ogImage],
+    brand: { '@type': 'Brand', name: SITE.domain },
+    offers: {
+      '@type': 'Offer',
+      url: `${SITE.url}/#acquisition`,
+      price: SITE.price,
+      priceCurrency: SITE.priceCurrency,
+      availability: 'https://schema.org/InStock',
+      itemCondition: 'https://schema.org/NewCondition',
+      priceValidUntil: SITE.priceValidUntil,
+      validFrom: '2026-09-08',
+      eligibleTransactionType: 'https://schema.org/FullPurchaseTransaction',
+      seller: { '@type': 'Organization', name: SITE.seller, url: SITE.url, email: SITE.email },
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'US',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: { '@type': 'MonetaryAmount', value: 0, currency: SITE.priceCurrency },
+        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'US' },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 0,
+            maxValue: 2,
+            unitCode: 'DAY',
+          },
+          transitTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 0,
+            maxValue: 3,
+            unitCode: 'DAY',
+          },
+        },
+      },
+    },
+  },
+];
+
+const allSchemas = [
+  ...baseSchemas,
+  ...(breadcrumbSchema ? [breadcrumbSchema] : []),
+  ...(articleSchema ? [articleSchema] : []),
+  ...schemas,
+];
 ---
 
 <!doctype html>
@@ -29,45 +189,69 @@ const siteName = 'ABQ.Coffee';
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
-    <link rel="canonical" href={canonical} />
-    <meta name="google-site-verification" content="h8Hy8oJWdGVkDzwxG6XMaJqp77Hj9xlEz791AWoR5bQ" />
+    <meta name="keywords" content={keywords} />
+    <meta name="robots" content={robots} />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <meta name="google-site-verification" content={SITE.googleSiteVerification} />
+    <meta name="author" content={SITE.seller} />
+    {canonicalUrl && <link rel="alternate" hreflang="en" href={canonicalUrl} />}
+    {canonicalUrl && <link rel="alternate" hreflang="x-default" href={canonicalUrl} />}
 
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content={ogType} />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:site_name" content={siteName} />
+    <meta property="og:image:alt" content={SITE.ogImageAlt} />
+    <meta property="og:site_name" content={SITE.name} />
     <meta property="og:locale" content="en_US" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={SITE.ogImageAlt} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
     <meta name="theme-color" content="#2a1913" />
 
-    <script type="application/ld+json" set:html={JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": siteName,
-      "url": "https://abq.coffee",
-      "description": description
-    })} />
-    <script type="application/ld+json" set:html={JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": title,
-      "description": description,
-      "url": canonical,
-      "primaryImageOfPage": { "@type": "ImageObject", "url": ogImage },
-      "datePublished": "2026-09-08",
-      "dateModified": "2026-09-08"
-    })} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"
+    />
+    <link rel="dns-prefetch" href={`https://${SITE.streamHost}`} />
+    <link rel="preload" as="image" href={streamPoster} />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
+
+    {
+      allSchemas.map((schema) => (
+        <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+      ))
+    }
   </head>
   <body class="min-h-screen flex flex-col">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-roast-900 focus:text-white focus:font-semibold"
+    >
+      Skip to content
+    </a>
     <slot />
+    <a
+      href="/#acquisition"
+      class="fixed inset-x-0 bottom-0 z-50 flex items-center justify-between gap-4 border-t border-white/10 bg-roast-950/95 px-4 py-3 backdrop-blur-md sm:hidden"
+      aria-label={`Inquire about ${SITE.domain}`}
+    >
+      <span class="leading-tight">
+        <span class="block text-[10px] uppercase tracking-[0.16em] text-roast-300">Domain for sale</span>
+        <span class="block font-display text-lg font-semibold text-cream-100">{SITE.priceDisplay}</span>
+      </span>
+      <span class="inline-flex min-h-10 items-center rounded-full bg-roast-300 px-5 text-sm font-medium text-roast-950">
+        Make an offer
+      </span>
+    </a>
   </body>
 </html>
